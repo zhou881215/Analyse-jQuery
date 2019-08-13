@@ -34,6 +34,15 @@
     }
   };
 
+  // 让每个方法都能返回prevObject
+  jQuery.prototype.pushStack = function(dom) {
+    if (dom.constructor !== jQuery) {
+      dom = jQuery(dom);
+    }
+    dom.prevObject = this; // 谁调用，谁就是那个prevObject；这个方法都是在实例方法里面调用，this都是一开始选择到的元素
+    return dom;
+  };
+
   jQuery.prototype.css = function(config) {
     for (var i = 0; i < this.length; i++) {
       for (var attr in config) {
@@ -56,7 +65,27 @@
   jQuery.prototype.eq = function(num) {
     var dom =
       num === undefined ? null : num >= 0 ? this[num] : this[num + this.length];
-    return jQuery(dom);
+    return this.pushStack(dom);
+  };
+
+  // 集中操作
+  jQuery.prototype.add = function(selector) {
+    var curObj = jQuery(selector);
+    var prevObj = this;
+    var newObj = jQuery();
+
+    for (var i = 0; i < curObj.length; i++) {
+      newObj[newObj.length++] = curObj[i];
+    }
+    for (var i = 0; i < prevObj.length; i++) {
+      newObj[newObj.length++] = prevObj[i];
+    }
+    return this.pushStack(newObj);
+  };
+
+  // 回退操作
+  jQuery.prototype.end = function() {
+    return this.prevObject;
   };
 
   jQuery.prototype.init.prototype = jQuery.prototype; // 是以init为构造函数创建出来的，所有需要把jq的原型赋给init的原型
