@@ -6,16 +6,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+  <!-- <script src="./jQ.js"></script> -->
+  <script src="../jQuery.js"></script>
+  <style>
+    .demo {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background-color: #ccc;
+    }
+
+    .test {
+      width: 100px;
+      height: 200px;
+      background-color: #ddd;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="demo" cram="zhou"></div>
-  <input type="checkbox" name="" id="" checked>
-
-  <!-- <script src="./jQ.js"></script> -->
-  <script src="../jQuery.js"></script>
+  <button class="stop">stop</button>
+  <div class="demo">1</div>
   <script>
-    console.log($('input').prop('checked'))
+    $('.demo').animate({
+        top: '200px',
+        left: '200px'
+      })
+      .delay(1000)
+      .animate({
+        top: '400px',
+        left: '200px'
+      })
+    $('.stop').on('click', function () {
+      $('.demo').stop(true, true);
+    })
   </script>
 </body>
 

@@ -88,6 +88,33 @@
     return this.prevObject;
   };
 
+  // on绑定事件, 这个只是绑定了自定义事件，没有处理原生事件
+  jQuery.prototype.myOn = function(type, handle) {
+    for (var i = 0; i < this.length; i++) {
+      if (!this[i].cacheEvent) {
+        this[i].cacheEvent = {};
+      }
+      if (!this[i].cacheEvent[type]) {
+        this[i].cacheEvent[type] = [handle];
+      } else {
+        this[i].cacheEvent[type].push(handle);
+      }
+    }
+  };
+
+  // trigger触发事件
+  jQuery.prototype.myTrigger = function(type) {
+    var params = arguments.length > 1 ? [].slice.call(arguments, 1) : [];
+    var self = this;
+    for (var i = 0; i < this.length; i++) {
+      if (this[i].cacheEvent[type]) {
+        this[i].cacheEvent[type].forEach(function(elem, index) {
+          elem.apply(self, params);
+        });
+      }
+    }
+  };
+
   jQuery.prototype.init.prototype = jQuery.prototype; // 是以init为构造函数创建出来的，所有需要把jq的原型赋给init的原型
   global.$ = global.jQuery = jQuery; // 把jQuery赋给window的$和jQuery属性
 })(window);
