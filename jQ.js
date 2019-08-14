@@ -89,21 +89,20 @@
   };
 
   // on绑定事件, 这个只是绑定了自定义事件，没有处理原生事件
-  jQuery.prototype.myOn = function(type, handle) {
+  jQuery.prototype.on = function(type, handle) {
     for (var i = 0; i < this.length; i++) {
       if (!this[i].cacheEvent) {
         this[i].cacheEvent = {};
       }
-      if (!this[i].cacheEvent[type]) {
-        this[i].cacheEvent[type] = [handle];
-      } else {
-        this[i].cacheEvent[type].push(handle);
-      }
+
+      !this[i].cacheEvent[type]
+        ? (this[i].cacheEvent[type] = [handle])
+        : this[i].cacheEvent[type].push(handle);
     }
   };
 
   // trigger触发事件
-  jQuery.prototype.myTrigger = function(type) {
+  jQuery.prototype.trigger = function(type) {
     var params = arguments.length > 1 ? [].slice.call(arguments, 1) : [];
     var self = this;
     for (var i = 0; i < this.length; i++) {
@@ -113,6 +112,42 @@
         });
       }
     }
+  };
+
+  // 压入队列
+  jQuery.prototype.queue = function() {
+    var queueObj = this,
+      queueName = arguments[0] || "fx",
+      addFunc = arguments[1] || null,
+      len = this.length;
+    // 获取队列
+    if (len === 1) {
+      return queueObj[0][queueName];
+    }
+    // 添加队列 或 往已有队列中添加内容
+    queueObj[0][queueName] === undefined
+      ? (queueObj[0][queueName] = [addFunc])
+      : queueObj[0][queueName].push(addFunc);
+
+    return this;
+  };
+
+  // 出队列执行
+  jQuery.prototype.dequeue = function() {
+    var self = this;
+    var queueName = arguments[0] || "fx";
+    var queueArr = this.queue(queueName);
+
+    var currFunc = queueArr.shift();
+    if (currFunc === undefined) {
+      return;
+    }
+    // 递归执行自己，就是执行下一个
+    var next = function() {
+      self.dequeue(queueName);
+    };
+    currFunc(next);
+    return this;
   };
 
   jQuery.prototype.init.prototype = jQuery.prototype; // 是以init为构造函数创建出来的，所有需要把jq的原型赋给init的原型
