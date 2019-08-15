@@ -6,38 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
-  <script src="./jQ.js"></script>
-  <!-- <script src="../jQuery.js"></script> -->
   <style>
     .demo {
       position: absolute;
       width: 100px;
       height: 100px;
-      background-color: #ccc;
-    }
-
-    .test {
-      width: 100px;
-      height: 200px;
-      background-color: #ddd;
+      background-color: red;
     }
   </style>
 </head>
 
 <body>
-  <button class="stop">stop</button>
-  <div class="demo">1</div>
+  <div class="demo"></div>
+  <!-- <script src="./jQ.js"></script> -->
+  <script src="../jQuery.js"></script>
   <script>
-    $('.demo').queue('chain', function (next) {
-      console.log(1);
-      next();
-    }).queue('chain', function (next) {
-      console.log(2);
-      next();
-    }).queue('chain', function (next) {
-      console.log(3);
-    })
-    // console.log($('.demo').queue('chain'))
+    var cbs = $.Callbacks();
+
+    function a() {
+      console.log(1)
+    }
+
+    function b() {
+      console.log(2)
+    }
+    cbs.add(a, b);
+    cbs.fire();
   </script>
 </body>
 

@@ -150,6 +150,41 @@
     return this;
   };
 
+  // 动画
+  jQuery.prototype.animate = function(json, callback) {
+    var len = this.length;
+    var self = this;
+    var baseFunc = function(next) {
+      var times = 0;
+      for (var i = 0; i < len; i++) {
+        startMove(self[i], json, function() {
+          times++;
+          if (times === len) {
+            callback && callback();
+            next();
+          }
+        });
+      }
+    };
+
+    this.queue("fx", baseFunc);
+
+    if (this.queue("fx").length === 1) {
+      this.dequeue("fx");
+    }
+  };
+
+  //延迟
+  jQuery.prototype.delay = function(duration) {
+    var queueArr = this[0]["fx"];
+    queueArr.push(function(next) {
+      setTimeout(function() {
+        next();
+      }, duration);
+    });
+    return this;
+  };
+
   jQuery.prototype.init.prototype = jQuery.prototype; // 是以init为构造函数创建出来的，所有需要把jq的原型赋给init的原型
   global.$ = global.jQuery = jQuery; // 把jQuery赋给window的$和jQuery属性
 })(window);
