@@ -21,17 +21,35 @@
   <!-- <script src="./jQ.js"></script> -->
   <script src="../jQuery.js"></script>
   <script>
-    var cbs = $.Callbacks();
-
-    function a() {
-      console.log(1)
+    function createScore() {
+      var df = $.Deferred();
+      // done成功 fail失败  progress正在进行
+      // resolve  reject    notify
+      setInterval(function () {
+        var score = Math.floor(Math.random() * 100);
+        if (score > 70) {
+          df.resolve('congratulation');
+        } else if (score < 30) {
+          df.reject('give up');
+        } else {
+          df.notify('go on');
+        }
+      }, 100)
+      return df.promise(); // 只返回注册功能，没有触发功能
+      // 保证外部只能注册，而不能随便触发
+      // 触发功能：resolve, resoslveWith, reject, rejectWith, notify, notifyWith
     }
 
-    function b() {
-      console.log(2)
-    }
-    cbs.add(a, b);
-    cbs.fire();
+    var df = createScore();
+    df.done(function (ms) {
+      console.log('yes', ms);
+    })
+    df.fail(function (ms) {
+      console.log('no', ms);
+    })
+    df.progress(function (ms) {
+      console.log('wtiating', ms);
+    })
   </script>
 </body>
 

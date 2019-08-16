@@ -185,6 +185,74 @@
     return this;
   };
 
+  jQuery.Callbacks = function() {
+    // 储存参数
+    var options = arguments[0] || "";
+    // 通过add添加方法
+    var list = [];
+    // 记录当前要执行的函数的索引
+    var fireIndex = 0;
+    // 记录是否被fire过
+    var fired = false;
+    // 实际参数列表
+    var args = [];
+
+    var fire = function() {
+      for (; fireIndex < list.length; fireIndex++) {
+        list[fireIndex].apply(window, args);
+      }
+      if (options.indexOf("once") !== -1) {
+        list = [];
+        fireIndex = 0;
+      }
+    };
+
+    return {
+      add: function(func) {
+        list.push(func);
+        if (options.indexOf("memory") !== -1) {
+          fired && fire();
+        }
+        return this;
+      },
+      fire: function() {
+        fireIndex = 0;
+        args = arguments;
+        fired = true;
+        fire();
+      }
+    };
+  };
+
+  jQuery.deferred = function() {
+    var arrCallbacks = [
+      [jQuery.Callbacks("once memory"), "done", "resolve"],
+      [jQuery.Callbacks("once memory"), "fail", "reject"],
+      [jQuery.Callbacks("memory"), "progress", "notify"]
+    ];
+    var pendding = true;
+    var deferred = {};
+    for (var i = 0; i < arrCallbacks.length; i++) {
+      deferred[arrCallbacks[i][1]] = (function(index) {
+        return function(func) {
+          arrCallbacks[index][0].add(func);
+        };
+      })(i);
+      // 触发
+      deferred[arrCallbacks[i][2]] = (function(index) {
+        return function() {
+          if (pendding) {
+            arrCallbacks[index][0].fire.apply(window, arguments);
+            pendding =
+              arrCallbacks[index][2] === "resolve" || "reject" ? false : true;
+          }
+        };
+      })(i);
+    }
+
+    return deferred;
+  };
+
   jQuery.prototype.init.prototype = jQuery.prototype; // 是以init为构造函数创建出来的，所有需要把jq的原型赋给init的原型
   global.$ = global.jQuery = jQuery; // 把jQuery赋给window的$和jQuery属性
 })(window);
